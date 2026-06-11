@@ -5,9 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Databricks Embedded Dashboard</title>
     <style>
+        /* This ensures the dashboard takes up the full screen */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
         #dashboard-container {
             width: 100%;
             height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f9f9f9;
         }
     </style>
 </head>
@@ -16,16 +30,21 @@
     <div id="dashboard-container"></div>
 
     <script type="module">
+        // We import the SDK directly from a CDN (esm.sh) so it works in the browser without Node.js
         import { DatabricksDashboard } from "https://esm.sh/@databricks/aibi-client";
 
         const dashboard = new DatabricksDashboard({
             instanceUrl: "https://dbc-298966db-19d5.cloud.databricks.com",
             workspaceId: "7474654912421722",
             dashboardId: "01f15da3f2df16229164dcab32670c45",
-            token: "YOUR_SERVER_MINTED_TOKEN_GOES_HERE", 
+            
+            // Keep this as a dummy placeholder string for your public GitHub repository safety!
+            token: "YOUR_SERVER_MINTED_TOKEN_PLACEHOLDER", 
+            
             container: document.getElementById("dashboard-container"),
         });
 
+        // Initialize and render the dashboard
         dashboard.initialize();
     </script>
 </body>
