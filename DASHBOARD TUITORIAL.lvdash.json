@@ -1,0 +1,1255 @@
+{
+  "datasets": [
+    {
+      "name": "d744d0a6",
+      "displayName": "df_sales_db",
+      "queryLines": [
+        "WITH df_sales_db AS (\r\n",
+        "    SELECT 101 AS sale_id, 'Kochi' AS city, 'Medicine' AS product_category, 1200 AS sales_amount\r\n",
+        "UNION ALL\r\n",
+        "SELECT 102, 'Kochi', 'Medicine', 1800\r\n",
+        "UNION ALL\r\n",
+        "SELECT 103, 'Kochi', 'Supplements', 2500\r\n",
+        "UNION ALL\r\n",
+        "SELECT 104, 'Kochi', 'Medical Devices', 4500\r\n",
+        "UNION ALL\r\n",
+        "SELECT 105, 'Chennai', 'Medicine', 1500\r\n",
+        "UNION ALL\r\n",
+        "SELECT 106, 'Chennai', 'Supplements', 2200\r\n",
+        "UNION ALL\r\n",
+        "SELECT 107, 'Chennai', 'Medical Devices', 5000\r\n",
+        "UNION ALL\r\n",
+        "SELECT 108, 'Chennai', 'Medicine', 1700\r\n",
+        "UNION ALL\r\n",
+        "SELECT 109, 'Bangalore', 'Medicine', 2100\r\n",
+        "UNION ALL\r\n",
+        "SELECT 110, 'Bangalore', 'Supplements', 2800\r\n",
+        "UNION ALL\r\n",
+        "SELECT 111, 'Bangalore', 'Medical Devices', 6000\r\n",
+        "UNION ALL\r\n",
+        "SELECT 112, 'Bangalore', 'Medicine', 2400\r\n",
+        "UNION ALL\r\n",
+        "SELECT 113, 'Hyderabad', 'Medicine', 1600\r\n",
+        "UNION ALL\r\n",
+        "SELECT 114, 'Hyderabad', 'Supplements', 2600\r\n",
+        "UNION ALL\r\n",
+        "SELECT 115, 'Hyderabad', 'Medical Devices', 5500\r\n",
+        "UNION ALL\r\n",
+        "SELECT 116, 'Hyderabad', 'Medicine', 1900\r\n",
+        "UNION ALL\r\n",
+        "SELECT 117, 'Delhi', 'Medicine', 2300\r\n",
+        "UNION ALL\r\n",
+        "SELECT 118, 'Delhi', 'Supplements', 3200\r\n",
+        "UNION ALL\r\n",
+        "SELECT 119, 'Delhi', 'Medical Devices', 7000\r\n",
+        "UNION ALL\r\n",
+        "SELECT 120, 'Delhi', 'Medicine', 2700\r\n",
+        "UNION ALL\r\n",
+        "SELECT 121, 'Kochi', 'Supplements', 2900\r\n",
+        "UNION ALL\r\n",
+        "SELECT 122, 'Chennai', 'Supplements', 3100\r\n",
+        "UNION ALL\r\n",
+        "SELECT 123, 'Bangalore', 'Medicine', 2600\r\n",
+        "UNION ALL\r\n",
+        "SELECT 124, 'Hyderabad', 'Medical Devices', 5800\r\n",
+        "UNION ALL\r\n",
+        "SELECT 125, 'Delhi', 'Supplements', 3400\r\n",
+        ")\r\n",
+        "SELECT * FROM df_sales_db;\r\n"
+      ]
+    },
+    {
+      "name": "84f54165",
+      "displayName": "sales_17",
+      "queryLines": [
+        "WITH sales AS (\n",
+        "    SELECT * FROM VALUES\n",
+        "    ('Kochi', '2024-01', 120000),\n",
+        "    ('Kochi', '2024-02', 135000),\n",
+        "    ('Kochi', '2024-03', 128000),\n",
+        "    ('Kochi', '2024-04', 150000),\n",
+        "\n",
+        "    ('Chennai', '2024-01', 110000),\n",
+        "    ('Chennai', '2024-02', 125000),\n",
+        "    ('Chennai', '2024-03', 140000),\n",
+        "    ('Chennai', '2024-04', 138000),\n",
+        "\n",
+        "    ('Bangalore', '2024-01', 150000),\n",
+        "    ('Bangalore', '2024-02', 155000),\n",
+        "    ('Bangalore', '2024-03', 149000),\n",
+        "    ('Bangalore', '2024-04', 165000),\n",
+        "\n",
+        "    ('Hyderabad', '2024-01', 90000),\n",
+        "    ('Hyderabad', '2024-02', 105000),\n",
+        "    ('Hyderabad', '2024-03', 112000),\n",
+        "    ('Hyderabad', '2024-04', 125000),\n",
+        "\n",
+        "    ('Delhi', '2024-01', 180000),\n",
+        "    ('Delhi', '2024-02', 175000),\n",
+        "    ('Delhi', '2024-03', 190000),\n",
+        "    ('Delhi', '2024-04', 210000)\n",
+        "    AS sales(city, month, sales_amount)\n",
+        "),\n",
+        "\n",
+        "sales_analysis AS (\n",
+        "    SELECT\n",
+        "        city,\n",
+        "        month,\n",
+        "        sales_amount,\n",
+        "\n",
+        "        LAG(sales_amount) OVER (\n",
+        "            PARTITION BY city\n",
+        "            ORDER BY month\n",
+        "        ) AS previous_sales,\n",
+        "\n",
+        "        sales_amount -\n",
+        "        LAG(sales_amount) OVER (\n",
+        "            PARTITION BY city\n",
+        "            ORDER BY month\n",
+        "        ) AS sales_difference,\n",
+        "\n",
+        "        ROUND(\n",
+        "            (\n",
+        "                sales_amount -\n",
+        "                LAG(sales_amount) OVER (\n",
+        "                    PARTITION BY city\n",
+        "                    ORDER BY month\n",
+        "                )\n",
+        "            ) * 100.0\n",
+        "            /\n",
+        "            LAG(sales_amount) OVER (\n",
+        "                PARTITION BY city\n",
+        "                ORDER BY month\n",
+        "            ),\n",
+        "            2\n",
+        "        ) AS growth_percentage,\n",
+        "\n",
+        "        SUM(sales_amount) OVER (\n",
+        "            PARTITION BY city\n",
+        "            ORDER BY month\n",
+        "            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n",
+        "        ) AS running_total\n",
+        "\n",
+        "    FROM sales\n",
+        ")\n",
+        "SELECT *\n",
+        "FROM sales_analysis\n",
+        "ORDER BY city, month;"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "a858c58f",
+      "displayName": "DAY 16",
+      "layout": [
+        {
+          "widget": {
+            "name": "sales_by_category",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Total Sales by Product Category",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(sales_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "a1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "avg(sales_amount)",
+                      "expression": "AVG(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average sales by Product Category"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(sales_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "number-of-s",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "count(*)",
+                      "expression": "COUNT(`*`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Number of Sales Transaction"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(*)",
+                  "displayName": "Number of Transactions",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "sales-summary-report",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    },
+                    {
+                      "name": "avg(sales_amount)",
+                      "expression": "AVG(`sales_amount`)"
+                    },
+                    {
+                      "name": "count(sale_id)",
+                      "expression": "COUNT(`sale_id`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Sales Summary Report"
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "product_category"
+                  },
+                  {
+                    "fieldName": "sum(sales_amount)",
+                    "displayName": "Total Sales"
+                  },
+                  {
+                    "fieldName": "avg(sales_amount)",
+                    "displayName": "Avg Sales"
+                  },
+                  {
+                    "fieldName": "count(sale_id)",
+                    "displayName": "Transaction Count"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 9,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "total-sales-by-city",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Sales by City"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(sales_amount)",
+                  "displayName": "Total sales",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "avg-sales-by-city",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "avg(sales_amount)",
+                      "expression": "AVG(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Sales by City"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(sales_amount)",
+                  "displayName": "Avg sales",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pivot-sales-by-city-category",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    },
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Pivot Sales by City & Category"
+              },
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "color": {
+                  "fieldName": "sum(sales_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "highest-sales-city",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Highest Sales City"
+              },
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(sales_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 20,
+            "width": 8,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "total-sales1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Sales"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(sales_amount)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 11,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "transactions",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "count(sale_id)",
+                      "expression": "COUNT(`sale_id`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Transactions Count"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "count(sale_id)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 20,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "avg-transaction",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "avg(sales_amount)",
+                      "expression": "AVG(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Average Transaction"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(sales_amount)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 23,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "transaction-count-pivot",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "count(product_category)",
+                      "expression": "COUNT(`product_category`)"
+                    },
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Transaction Count Pivot"
+              },
+              "widgetType": "heatmap",
+              "encodings": {
+                "x": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "product_category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "color": {
+                  "fieldName": "count(product_category)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 26,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "sales-contribution-percentage",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d744d0a6",
+                  "fields": [
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    },
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Sales Contribution %"
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(sales_amount)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "product_category",
+                  "displayName": "product category",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 26,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "91fca1c3",
+      "displayName": "DAY 17",
+      "layout": [
+        {
+          "widget": {
+            "name": "executive-summary",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total sales"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(sales_amount)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "highest_sales_city",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "City with Highest Total Sales",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(sales_amount)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact"
+                  },
+                  "displayName": "Total Sales",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "bca7e0f8",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "max(growth_percentage)",
+                      "expression": "MAX(`growth_percentage`)"
+                    },
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "City with growth percentage",
+                "showTitle": true
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "max(growth_percentage)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "city-largest-sales-drop",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "min(sales_difference)",
+                      "expression": "MIN(`sales_difference`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "city that experienced the largest sales drop"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "city",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "min(sales_difference)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "ce8756fa",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "month",
+                      "expression": "`month`"
+                    },
+                    {
+                      "name": "sum(sales_amount)",
+                      "expression": "SUM(`sales_amount`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "Monthly sales trends by city",
+                "showTitle": true
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "month",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(sales_amount)",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact"
+                  },
+                  "displayName": "Sales Amount",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "city",
+                  "displayName": "City",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "maximum",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "max(growth_percentage)",
+                      "expression": "MAX(`growth_percentage`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Maximum growth percentage"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(growth_percentage)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "largest-sales-drop1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "min(sales_difference)",
+                      "expression": "MIN(`sales_difference`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "largest sales drop"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "min(sales_difference)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 7,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "running-total",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "84f54165",
+                  "fields": [
+                    {
+                      "name": "month",
+                      "expression": "`month`"
+                    },
+                    {
+                      "name": "running_total",
+                      "expression": "`running_total`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Running Total"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "month",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "running_total"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    }
+                  },
+                  "secondary": {
+                    "fields": [],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideTitle": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 15,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
