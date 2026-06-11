@@ -5,14 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Databricks Embedded Dashboard</title>
     <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-        }
         #dashboard-container {
-            width: 100vw;
+            width: 100%;
             height: 100vh;
-            border: none;
         }
     </style>
 </head>
@@ -20,6 +15,18 @@
 
     <div id="dashboard-container"></div>
 
-    <script type="module" src="/src/app.js"></script>
+    <script type="module">
+        import { DatabricksDashboard } from "https://esm.sh/@databricks/aibi-client";
+
+        const dashboard = new DatabricksDashboard({
+            instanceUrl: "https://dbc-298966db-19d5.cloud.databricks.com",
+            workspaceId: "7474654912421722",
+            dashboardId: "01f15da3f2df16229164dcab32670c45",
+            token: "YOUR_SERVER_MINTED_TOKEN_GOES_HERE", 
+            container: document.getElementById("dashboard-container"),
+        });
+
+        dashboard.initialize();
+    </script>
 </body>
 </html>
